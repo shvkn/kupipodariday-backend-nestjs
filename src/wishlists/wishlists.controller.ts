@@ -7,9 +7,10 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { WishlistsService } from './wishlists.service';
+
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
+import { WishlistsService } from './wishlists.service';
 
 @Controller('wishlists')
 export class WishlistsController {

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+
 import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 
