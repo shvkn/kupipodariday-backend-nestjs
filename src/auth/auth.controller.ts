@@ -3,14 +3,18 @@ import { Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { LocalAuthGuard } from '../guards/local-auth.guard';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
+import { AuthService } from './auth.service';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly authService: AuthService,
+  ) {}
   @UseGuards(LocalAuthGuard)
   @Post('signin')
   signIn(@Request() req) {
-    return req.user;
+    return this.authService.login(req.user);
   }
 
   @Post('signup')
