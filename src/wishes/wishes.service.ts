@@ -1,27 +1,73 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
+import { User } from '../users/entities/user.entity';
 import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
+import { Wish } from './entities/wish.entity';
 
 @Injectable()
 export class WishesService {
-  create(createWishDto: CreateWishDto) {
-    return 'This action adds a new wish';
-  }
+  constructor(
+    @InjectRepository(Wish) private readonly wishesRepository: Repository<Wish>,
+  ) {}
 
-  findAll() {
-    return `This action returns all wishes`;
+  create(createWishDto: CreateWishDto, owner: User) {
+    return this.wishesRepository.save({ ...createWishDto, owner });
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} wish`;
+    return this.wishesRepository.findOne({
+      where: { id },
+      relations: {
+        owner: true,
+        offers: true,
+      },
+    });
   }
 
-  update(id: number, updateWishDto: UpdateWishDto) {
-    return `This action updates a #${id} wish`;
+  async update(id: number, updateWishDto: UpdateWishDto) {
+    const wish = await this.findOne(id);
+    if (!wish || wish.raised > 0) {
+      throw new BadRequestException();
+    }
+    return this.wishesRepository.save({
+      ...wish,
+      ...updateWishDto,
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} wish`;
+  async remove(id: number) {
+    const wish = await this.findOne(id);
+    if (!wish) {
+      throw new BadRequestException();
+    }
+    return this.wishesRepository.remove(wish);
+  }
+
+  async copy(id: number, owner: User) {
+    const wish = await this.findOne(id);
+    if (!wish) {
+      throw new BadRequestException();
+    }
+    wish.copied += 1;
+    await this.wishesRepository.save(wish);
+    delete wish.id;
+    return this.create(wish, owner);
+  }
+
+  async last(count = 40) {
+    return await this.wishesRepository.find({
+      order: { createdAt: 'DESC' },
+      take: count,
+    });
+  }
+
+  async top(count = 20) {
+    return await this.wishesRepository.find({
+      order: { copied: 'DESC' },
+      take: count,
+    });
   }
 }
