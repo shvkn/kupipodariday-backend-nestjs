@@ -32,15 +32,14 @@ export class UsersService {
     return await this.usersRepository.save(createUserDto);
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(query: string, updateUserDto: UpdateUserDto) {
+    const user = await this.findOne(query);
+    if (!user) {
+      throw new BadRequestException();
+    }
+    return await this.usersRepository.save({
+      ...user,
+      ...updateUserDto,
+    });
   }
 }
