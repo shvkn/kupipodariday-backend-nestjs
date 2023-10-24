@@ -34,6 +34,12 @@ export class UsersController {
     return req.user;
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('me/wishes')
+  getMyWishes(@Request() req) {
+    return req.user.wishes;
+  }
+
   @Post('find')
   findUser(@Body() body: { query: string }) {
     return this.usersService.findOne(body.query);
