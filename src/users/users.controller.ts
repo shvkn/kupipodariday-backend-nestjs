@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Patch,
   Post,
   Request,
@@ -31,5 +32,10 @@ export class UsersController {
   @Patch('me')
   updateProfile(@Request() req) {
     return req.user;
+  }
+
+  @Get(':username')
+  getUser(@Param('username') username: string) {
+    return this.usersService.findOne(username);
   }
 }
