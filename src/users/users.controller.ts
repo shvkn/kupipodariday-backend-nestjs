@@ -34,6 +34,11 @@ export class UsersController {
     return req.user;
   }
 
+  @Post('find')
+  findUser(@Body() body: { query: string }) {
+    return this.usersService.findOne(body.query);
+  }
+
   @Get(':username')
   getUser(@Param('username') username: string) {
     return this.usersService.findOne(username);
