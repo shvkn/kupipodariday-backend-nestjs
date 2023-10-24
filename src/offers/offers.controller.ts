@@ -6,8 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 
+import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
 import { OffersService } from './offers.service';
@@ -16,28 +19,19 @@ import { OffersService } from './offers.service';
 export class OffersController {
   constructor(private readonly offersService: OffersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createOfferDto: CreateOfferDto) {
-    return this.offersService.create(createOfferDto);
+  create(@Body() createOfferDto: CreateOfferDto, @Request() req) {
+    return this.offersService.create(createOfferDto, req.user);
   }
 
   @Get()
-  findAll() {
+  getAll() {
     return this.offersService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  getById(@Param('id') id: string) {
     return this.offersService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
-    return this.offersService.update(+id, updateOfferDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.offersService.remove(+id);
   }
 }
