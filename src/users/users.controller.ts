@@ -49,4 +49,10 @@ export class UsersController {
   getUser(@Param('username') username: string) {
     return this.usersService.findOne(username);
   }
+
+  @Get(':username/wishes')
+  async getUserWishes(@Param('username') username: string) {
+    const user = await this.usersService.findOne(username);
+    return user?.wishes;
+  }
 }
